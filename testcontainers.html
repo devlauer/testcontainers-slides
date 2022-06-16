@@ -420,12 +420,14 @@ Abhängigkeiten zu Datenbanken, Message Queues, Webservern</p></li></ul></div></
 auf der Platte gespeichert werden</p></li></ul></div></div></section>
 <section id="_funktionen_für_browsertests"><h2>Funktionen für Browsertests</h2><div class="slide-content"><div class="ulist text-1xl"><ul><li><p>Container rendern in Virtualframebuffer, welcher via XSession über VNC verfügbar ist</p></li><li><p>VNC Recorder per Sidecar zur Videoaufzeichnung</p></li><li><p>Browsercontainer im gleichen Netzwerk wie der Applicationcontainer</p></li></ul></div></div></section>
 <section id="_junit_4"><h2>JUnit 4</h2><div class="slide-content"><div class="paragraph text-1xl"><p>Support für JUnit4 Rules</p></div>
-<div class="listingblock"><div class="content"><pre class="highlightjs highlight"><code class="language-java hljs" data-noescape="true" data-line-numbers="5,6,10,11" data-lang="java">public class RedisBackedCacheIntTest {
+<div class="listingblock"><div class="content"><pre class="highlightjs highlight"><code class="language-java hljs" data-noescape="true" data-line-numbers="5,6,7,8,12,13" data-lang="java">public class RedisBackedCacheIntTest {
 
     private RedisBackedCache underTest;
 
     @Rule
-    public GenericContainer redis = new GenericContainer(DockerImageName.parse("redis:5.0.3-alpine")).withExposedPorts(6379);
+    public GenericContainer redis = new GenericContainer(
+    	DockerImageName.parse("redis:5.0.3-alpine"))
+    	.withExposedPorts(6379);
 
     @Before
     public void setUp() {
@@ -442,13 +444,15 @@ auf der Platte gespeichert werden</p></li></ul></div></div></section>
     }
 }</code></pre></div></div></div></section>
 <section id="_junit_5"><h2>JUnit 5</h2><div class="slide-content"><div class="paragraph text-1xl"><p>Support für JUnit5</p></div>
-<div class="listingblock"><div class="content"><pre class="highlightjs highlight"><code class="language-java hljs" data-noescape="true" data-line-numbers="1,6,7,11,12" data-lang="java">@Testcontainers
+<div class="listingblock"><div class="content"><pre class="highlightjs highlight"><code class="language-java hljs" data-noescape="true" data-line-numbers="1,6,7,8,9,13,14" data-lang="java">@Testcontainers
 class RedisBackedCacheIntTest {
 
     private RedisBackedCache underTest;
 
     @Container
-    GenericContainer redis = new GenericContainer(DockerImageName.parse("redis:5.0.3-alpine")).withExposedPorts(6379);
+    GenericContainer redis = new GenericContainer(
+    	DockerImageName.parse("redis:5.0.3-alpine"))
+    	.withExposedPorts(6379);
 
     @BeforeEach
     void setUp() {

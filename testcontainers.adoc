@@ -183,14 +183,16 @@ auf der Platte gespeichert werden
 [.text-1xl]
 Support für JUnit4 Rules
 
-[source,java,highlight='5-6,10-11']
+[source,java,highlight='5-8,12-13']
 ----
 public class RedisBackedCacheIntTest {
 
     private RedisBackedCache underTest;
 
     @Rule
-    public GenericContainer redis = new GenericContainer(DockerImageName.parse("redis:5.0.3-alpine")).withExposedPorts(6379);
+    public GenericContainer redis = new GenericContainer(
+    	DockerImageName.parse("redis:5.0.3-alpine"))
+    	.withExposedPorts(6379);
 
     @Before
     public void setUp() {
@@ -213,7 +215,7 @@ public class RedisBackedCacheIntTest {
 [.text-1xl]
 Support für JUnit5
 
-[source,java,highlight='1,6-7,11-12']
+[source,java,highlight='1,6-9,13-14']
 ----
 @Testcontainers
 class RedisBackedCacheIntTest {
@@ -221,7 +223,9 @@ class RedisBackedCacheIntTest {
     private RedisBackedCache underTest;
 
     @Container
-    GenericContainer redis = new GenericContainer(DockerImageName.parse("redis:5.0.3-alpine")).withExposedPorts(6379);
+    GenericContainer redis = new GenericContainer(
+    	DockerImageName.parse("redis:5.0.3-alpine"))
+    	.withExposedPorts(6379);
 
     @BeforeEach
     void setUp() {
