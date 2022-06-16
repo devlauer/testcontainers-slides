@@ -1,0 +1,315 @@
+= Testcontainers 
+:revealjsdir: ../reveal.js
+:imagesdir: ./images
+:customcss: ./testcontainers.css
+:revealjs_progress: true
+:revealjs_slideNumber: true
+:revealjs_hash: true
+:source-highlighter: highlightjs
+
+
+== Allgemein
+
+[.text-1xl]
+* Testcontainers Java seit 2015
+* 100% OSS, MIT licensed
+* Core Maintainers
+** Richard North
+** Sergei Egorov
+** Kevin Wittek
+* 6k Stars on Github
+* Forks in vielen anderen Sprachen wie Python, C#, Rust, Go, JS, Scala etc.
+
+
+== Ziel
+
+[.text-1xl]
+* einfaches Onboarding für ein Projekt 
+** ohne große Wiki- und Installationsanleitungen
+** nur Maven und Docker notwendig
+
+* einfach Testumgebungen aufsetzen
+** gleichartiger Build und gleichartige Testumgebungen
+** self contained und portable
+** keine Abhängigkeit zu anderen Systemen (außer Docker)
+
+* Integrationstests statt integrierte Tests ermöglichen
+
+
+== Warum Tests
+
+[.text-1xl]
+* Um die Anforderung an die Software abzudecken,
+* Um Vertrauen zu haben, dass die Software läuft,
+* Um Vertrauen zu haben, dass es keine Bugs gibt
+
+
+=== Testpyramide
+
+[.maxed-image]
+image::https://martinfowler.com/articles/practical-test-pyramid/testPyramid.png[]
+
+footnote:[https://martinfowler.com/articles/practical-test-pyramid.html]
+[.notes]
+--
+* Kosten für Unittests geringer, am größten für E2E Tests 
+* Unittests scheller, E2E am langsamsten
+* Unittests aber nur für einfache Probleme, E2E für große Probleme
+* Integrationstests bieten eine Balance zwischen schnell, Kosten 
+und großem Nutzen für größere Probleme
+* Einfacher zu refactoren
+** Beispiel mit A, B, C Komponenten bringen, die zu A und B gemergt werden
+--
+
+
+=== Honeycomb
+
+[.maxed-image]
+image::https://engineering.atspotify.com/wp-content/uploads/sites/2/2018/02/microservices-testing-honeycomb-2.png[]
+footnote:[https://engineering.atspotify.com/2018/01/testing-of-microservices/]
+
+=== Testing Trophy
+
+[.maxed-image]
+image::https://res.cloudinary.com/practicaldev/image/fetch/s--gAKCGCWL--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_880/https://i.imgur.com/a7EOsLS.png[]
+footnote:[https://dev.to/wescopeland/cypress-super-patterns-how-to-elevate-the-quality-of-your-test-suite-1lcf]
+
+== Integrationtest vs. integrierter Test 
+
+[.text-1xl]
+* Integrationtest + 
+Ein Test, der mit externen Abhängigkeiten (wie bspw. mit einem  
+Application Server, mit Frameworks, mit dem Netzwerk, 
+mit dem Dateisystem oder mit der Datenbank) interagiert 
+
+* Integrierte Tests +
+Ein Test mit externen Abhängigkeiten, dessen Erfolg von diesen
+Abhängigkeiten abhängig ist, bspw.
+ 
+** man muss etwas starten,
+** man setzt auf etwas Laufendem auf
+** man testet gegen andere Services in einer gemeinsamen Testumgebung
+** Änderungen am eigenen Service können Tests anderer Systeme brechen
+
+
+== typische unterstützte Integrationtests
+
+[.text-1xl]
+* Data Access Layer Integrationtests 
+
+* Application Integrationtests 
+
+* UI/Acceptance tests 
+
+[.notes]
+--
+* Data Access Layer Integrationtests: 
+** durch direkte Verwendung der Zieldatenbank komplette Kompatibilität 
+mit Ziel-DB
+** Vermeidung komplexes Setup
+** auch spezifische SQLs testbar 
+
+* Application Integrationtests: 
+** Test der Anwendung in einem komplexen Umfeld mit kurzlebigen 
+Abhängigkeiten zu Datenbanken, Message Queues, Webservern 
+
+* UI/Acceptance tests: 
+** mittels containerisierter Browser Seleniumtests durchführen, 
+** jeder Test mit neuen Browserinstanzen
+*** ohne State wie Cookies etc.
+*** mit verschiedenen Pluginvarianten
+** Videorecording als Option (bspw. für Fehler)
+
+--
+
+== Allgemeine Fähigkeiten
+
+[.text-1xl]
+* Generic Docker container support +
+-> jedes Docker-Image für Tests nutzbar
+* Datenbanken und Stream processing (Kafka, Pulsar)
+* AWS mocks (localstack), Azure
+* Docker Compose
+* Selenium
+* Chaos testing
+
+[.notes]
+--
+* Datenbanken -> MS SQL Server, Oracle, DB2, MariaDB etc. (ca. 17 Stück)
+* Suchengines -> Elasticsearch, Solr
+* Messagingsysteme -> Kafka, RabbitMQ etc.
+* Cloud Simulationen -> Azure oder Localstack (Amazon)
+* Selenium Webbrowser -> Chrome, Edge, Firefox etc.
+* MockServer zum Mocken von HTTP-Calls
+* toxiproxy von shopify für chaos testing oder Bandbreitenreduktion oder
+ähnliches: 
+* Timeouts, Bandbreite, Latenz, etc
+link:https://www.testcontainers.org/modules/toxiproxy/[]
+
+* beliebige andere Systeme, da über Container instanziierbar
+
+--
+
+== Allgemeine Fähigkeiten
+
+[.text-1xl]
+* Dynamic port binding und API
+* WaitStrategies (bspw. PostgreSQL startet zweimal im Image)
+* Docker Discovery (docker-machine, DOCKER_HOST, Docker for Mac, Docker for Windows
+* Plattform unabhängig (Linux, macOS, Windows 10 (with NPIPE support)
+
+== Funktionen Datenbanken
+
+[.text-1xl]
+* getJDBCURL um den dynamischen Port zu ermitteln und die JDBC-URL zusammenzusetzen
+* JDBC-Driver-Proxy
+** enthält ":tc:", startet den Datenbankcontainer beim Connectionaufbau
+** reicht Befehle an den eigentlichen Datenbanktreiber weiter
+* "TC_DAEMON = true" hält den Container länger als die Connection am Leben
+* "TC_TMPFS=/testtmpfs:rw" damit Daten im Container im Hauptspeicher statt 
+auf der Platte gespeichert werden
+
+== Funktionen für Browsertests
+
+[.text-1xl]
+* Container rendern in Virtualframebuffer, welcher via XSession über VNC verfügbar ist
+* VNC Recorder per Sidecar zur Videoaufzeichnung 
+* Browsercontainer im gleichen Netzwerk wie der Applicationcontainer
+
+
+== JUnit 4
+
+[.text-1xl]
+Support für JUnit4 Rules
+
+[source,java,highlight='5-6,10-11']
+----
+public class RedisBackedCacheIntTest {
+
+    private RedisBackedCache underTest;
+
+    @Rule
+    public GenericContainer redis = new GenericContainer(DockerImageName.parse("redis:5.0.3-alpine")).withExposedPorts(6379);
+
+    @Before
+    public void setUp() {
+        String address = redis.getHost();
+        Integer port = redis.getFirstMappedPort();
+        underTest = new RedisBackedCache(address, port);
+    }
+
+    @Test
+    public void testSimplePutAndGet() {
+        underTest.put("test", "example");
+        String retrieved = underTest.get("test");
+        assertEquals("example", retrieved);
+    }
+}
+----
+
+== JUnit 5
+
+[.text-1xl]
+Support für JUnit5
+
+[source,java,highlight='1,6-7,11-12']
+----
+@Testcontainers
+class RedisBackedCacheIntTest {
+
+    private RedisBackedCache underTest;
+
+    @Container
+    GenericContainer redis = new GenericContainer(DockerImageName.parse("redis:5.0.3-alpine")).withExposedPorts(6379);
+
+    @BeforeEach
+    void setUp() {
+        String address = redis.getHost();
+        Integer port = redis.getFirstMappedPort();
+        underTest = new RedisBackedCache(address, port);
+    }
+
+    @Test
+    void testSimplePutAndGet() {
+        underTest.put("test", "example");
+        String retrieved = underTest.get("test");
+        assertEquals("example", retrieved);
+    }
+}
+----
+
+== Was ist notwendig?
+
+[.text-1xl]
+* Docker
+* Maven Abhängigkeiten (BOM steht zur Verfügung)
+
+[.text-1xl]
+Lässt sich bspw. bei Datenbanken gut mit Flyway kombinieren, 
+damit Schemata frisch und sauber nach aktuell gewünschtem Muster entstehen.
+
+== Was zu beachten?
+
+[.text-1xl]
+* Container aufgrund der Startzeit möglichst häufig wiederverwenden +
+* Strategie für Testpollution implementieren 
+** bspw. Flyway (clean, migrate) für Datenbanken nutzen
+** logisch löschen
+* Container möglichst zum Start der Testsuite instanziieren
+Evtl. Probleme bei Frameworks, wenn die gestartete Container zu Beginn
+des eigenen Lifecycles benötigten. 
+
+== Arbeitsweise
+
+[.text-1xl]
+* Testcontainers nutzt zur Verwaltung einen Sidecar Container (ryuk) +
+** JVM Hooks waren nicht zuverlässig +
+** mittels Heartbeat-Aufrufe an den Lifecycle des JVM Prozesses gebunden 
+** räumt auf, wenn
+*** Heartbeat ausbleibt
+*** JVM-Hook den Befehl gibt
+** lässt sich ausschalten über Env-Variable TESTCONTAINERS_RYUK_DISABLED
+** Nachteil: benötigt Zugriff auf den Dockersocket (DinD)
+
+
+== Nachteile
+
+[.text-1xl]
+* langsamer als reine In-Memory-Datenbanken beim Start
+* Abhängigkeit zu Docker
+* aufgrund der zu startenden Container muss die CI-Umgebung größer dimensioniert sein (RAM, CPU)
+* Entwickler benötigen lokal ausreichend Kapazitäten oder entsprechend dimensionierte Dockerserver    
+* Änderungen der Außenwelt werden nicht direkt sichtbar (bspw. wenn sich eine REST- oder SOAP-Schnittstelle geändert hat)
+
+
+== Vorteile
+
+[.text-1xl]
+* produktionsnäher, spezifischer
+** bspw. Partitioning oder spezielle SQL-Statements   
+* komplexere Probleme lassen sich leichter finden
+* HTTP Systeme lassen sich mocken, nicht erwartete HTTP-Codes lassen sich provozieren
+* Netzwerkprobleme, Timeouts oder gestoppte Abhängigkeiten lassen sich simulieren
+* Tests lassen sich (bei geladenen Images) auch offline ausführen
+* Tests lassen sich durch jeden nachvollziehen
+* Startups oder Datenbankmigrationen lassen sich besser testen    
+
+== Demo
+
+*DEMO*
+
+== Nutzung in CI-Systemen
+
+[.text-1xl]
+* DinD (Docker inside Docker) 
+** normalerweise sind die Images schon gecached, da diese im Daemon liegen
+** bei DinD wird der Cache nach dem Laufen ja immer gelöscht
+** man muss dann mit diesem Problem leben, aber man ist voll isoliert 
+* Docker Wormhole (Roland Huss)
+** man mountet den Docker Socket in den Container rein 
+** Nebeneffekt, Container keine Kinder des Buildcontainers, sondern Siblings
+** problematisch bei Mounts
+** bei Testcontainers gibt es den Workaround, dass Dateien reinkopiert werden
+
+
+
