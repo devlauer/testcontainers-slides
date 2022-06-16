@@ -1,10 +1,11 @@
 = Testcontainers 
-:revealjsdir: ./reveal.js
-:imagesdir: ./images
-:customcss: ./testcontainers.css
+:revealjsdir: reveal.js/dist
+:imagesdir: images
+:customcss: testcontainers.css
 :revealjs_progress: true
 :revealjs_slideNumber: true
 :revealjs_hash: true
+:revealjs_transition: convex 
 :source-highlighter: highlightjs
 
 
