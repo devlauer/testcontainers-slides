@@ -68,6 +68,6 @@
 	font-size: 1.25rem; /* 20px */	
 }
 
-.hljs-meta {
+.hljs-comment, .hljs-quote, .hljs-deletion, .hljs-meta {
 	color: yellow;
 }
