@@ -1,5 +1,5 @@
 = Testcontainers 
-:revealjsdir: reveal.js/dist
+:revealjsdir: reveal.js
 :imagesdir: images
 :customcss: testcontainers.css
 :revealjs_progress: true
